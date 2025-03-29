@@ -4,46 +4,57 @@ module.exports = async (req, res) => {
   const { id } = req.query;
 
   if (!id) {
-    return res.status(400).send('ID parameter is required.');
+    res.status(400).send('ID parameter is required.');
+    return;
   }
 
-  const urlForTs = `http://watchindia.net:8880/live/97869/86543/${id}.ts`;
+  const urlForDomain = `http://watchindia.net:8880/live/97869/86543/2182.ts`;
 
   try {
-    console.log(`Attempting to fetch stream for ID: ${id} from ${urlForTs}`);
-
-    // Request the .ts stream data
-    const responseForTs = await axios.get(urlForTs, {
+    // First request to fetch the domain
+    const responseForDomain = await axios.get(urlForDomain, {
       headers: {
         'User-Agent': 'OTT Navigator/1.6.7.4 (Linux;Android 11) ExoPlayerLib/2.15.1',
-        'Host': 'watchindia.net:8880',
+        'Host': 'opplex.tv:8080',
         'Connection': 'Keep-Alive',
         'Accept-Encoding': 'gzip',
       },
-      responseType: 'arraybuffer', // Expecting binary data (video)
+      maxRedirects: 0, // We don't want to follow redirects automatically
     });
 
-    console.log(`Stream fetched successfully for ID: ${id}`);
+    const locationUrl = responseForDomain.headers['location'];
 
-    // Set proper content type for video streaming
-    res.set('Content-Type', 'video/MP2T'); 
-
-    // Send the stream data back to the client
-    res.send(responseForTs.data);
-  } catch (error) {
-    // Log error for debugging
-    console.error(`Error fetching stream for ID: ${id}`);
-    console.error(error);
-
-    if (error.response) {
-      // Log the response status and headers for debugging
-      console.error('Error Response Status:', error.response.status);
-      console.error('Error Response Headers:', error.response.headers);
-      return res.status(error.response.status).send(`Error: ${error.response.status}`);
-    } else {
-      // General error fallback
-      console.error('Unknown error occurred');
-      res.status(500).send('An error occurred while processing the stream.');
+    if (!locationUrl) {
+      return res.status(500).send('Error extracting location URL');
     }
+
+    const domain = new URL(locationUrl).host;
+
+    // Second request to fetch the stream
+    const responseForTs = await axios.get(`http://opplex.tv:8080/live/45882233/989898/${id}.ts`, {
+      headers: {
+        'User-Agent': 'OTT Navigator/1.6.7.4 (Linux;Android 11) ExoPlayerLib/2.15.1',
+        'Host': 'opplex.tv:8080',
+        'Connection': 'Keep-Alive',
+        'Accept-Encoding': 'gzip',
+      },
+      responseType: 'arraybuffer',
+    });
+
+    const modifiedResponseTextForTs = responseForTs.data.toString().replace(
+      '/hlsr/',
+      `http://${domain}/hlsr/`
+    );
+
+    res.send(modifiedResponseTextForTs);
+  } catch (error) {
+    if (error.response) {
+      if (error.response.status === 403) {
+        return res.status(403).send('Error: 403 Forbidden');
+      } else {
+        return res.status(500).send(`Error: ${error.response.status}`);
+      }
+    }
+    return res.status(500).send('An error occurred.');
   }
 };
