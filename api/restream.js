@@ -1,8 +1,13 @@
 const axios = require('axios');
 
 module.exports = async (req, res) => {
+  // Log the entire query object to debug the incoming request
+  console.log('Request Query:', req.query);
+
+  // Extract the `id` parameter from the query string
   const { id } = req.query;
 
+  // If `id` is not provided, return an error message
   if (!id) {
     return res.status(400).send('ID parameter is required.');
   }
@@ -18,7 +23,6 @@ module.exports = async (req, res) => {
         'Connection': 'Keep-Alive',
         'Accept-Encoding': 'gzip',
       },
-      // Remove maxRedirects: 0 to allow following redirects automatically
     });
 
     const locationUrl = responseForDomain.headers['location'];
@@ -40,14 +44,18 @@ module.exports = async (req, res) => {
       responseType: 'arraybuffer',
     });
 
+    // Modify the response text to include the dynamic domain URL
     const modifiedResponseTextForTs = responseForTs.data.toString().replace(
       '/hlsr/',
       `http://${domain}/hlsr/`
     );
 
+    // Send the modified response back to the client
     res.send(modifiedResponseTextForTs);
   } catch (error) {
-    console.error("Error details:", error); // This will show the error in the logs
+    console.error("Error details:", error);  // Log the error details
+
+    // Handle different types of errors based on the response status
     if (error.response) {
       if (error.response.status === 403) {
         return res.status(403).send('Error: 403 Forbidden');
