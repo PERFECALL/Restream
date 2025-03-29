@@ -1,7 +1,7 @@
 {
   "functions": {
     "api/restream.js": {
-      "timeout": 15
+      "timeout": 30  // Increase to 30 seconds
     }
   }
 }
