@@ -7,7 +7,7 @@ module.exports = async (req, res) => {
     return res.status(400).send('ID parameter is required.');
   }
 
-  const urlForDomain = `http://watchindia.net:8880/live/97869/86543/${id}.ts`;  // URL for fetching stream.
+  const urlForDomain = `http://watchindia.net:8880/live/97869/86543/2182.ts`;  // URL for fetching stream.
 
   try {
     // First request to fetch the stream
