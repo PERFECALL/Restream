@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 module.exports = async (req, res) => {
-  // Log the entire query object to debug the incoming request
+  // Log the entire request query object to debug the incoming request
   console.log('Request Query:', req.query);
 
   // Extract the `id` parameter from the query string
