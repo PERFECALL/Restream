@@ -12,6 +12,7 @@ module.exports = async (req, res) => {
     return res.status(400).send('ID parameter is required.');
   }
 
+  // Correct URL to fetch the stream, using the watchindia.net domain
   const urlForDomain = `http://watchindia.net:8880/live/97869/86543/${id}.ts`;
 
   try {
@@ -19,7 +20,7 @@ module.exports = async (req, res) => {
     const responseForDomain = await axios.get(urlForDomain, {
       headers: {
         'User-Agent': 'OTT Navigator/1.6.7.4 (Linux;Android 11) ExoPlayerLib/2.15.1',
-        'Host': 'opplex.tv:8080',
+        'Host': 'watchindia.net:8880',  // Correct host here
         'Connection': 'Keep-Alive',
         'Accept-Encoding': 'gzip',
       },
@@ -31,13 +32,14 @@ module.exports = async (req, res) => {
       return res.status(500).send('Error extracting location URL.');
     }
 
+    // Extract the domain from the location URL
     const domain = new URL(locationUrl).host;
 
     // Second request to fetch the stream
-    const responseForTs = await axios.get(`http://opplex.tv:8080/live/45882233/989898/${id}.ts`, {
+    const responseForTs = await axios.get(`http://watchindia.net:8880/live/97869/86543/${id}.ts`, {
       headers: {
         'User-Agent': 'OTT Navigator/1.6.7.4 (Linux;Android 11) ExoPlayerLib/2.15.1',
-        'Host': 'opplex.tv:8080',
+        'Host': 'watchindia.net:8880',  // Correct host here
         'Connection': 'Keep-Alive',
         'Accept-Encoding': 'gzip',
       },
