@@ -1,0 +1,11 @@
+{
+  "name": "restream",
+  "version": "1.0.0",
+  "main": "api/restream.js",
+  "dependencies": {
+    "axios": "^0.21.1"
+  },
+  "engines": {
+    "node": "16.x"
+  }
+}
