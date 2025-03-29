@@ -1,15 +1,7 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "api/restream.js",
-      "use": "@vercel/node"
+  "functions": {
+    "api/restream.js": {
+      "timeout": 15
     }
-  ],
-  "routes": [
-    {
-      "src": "/api/restream",
-      "dest": "/api/restream.js"
-    }
-  ]
+  }
 }
